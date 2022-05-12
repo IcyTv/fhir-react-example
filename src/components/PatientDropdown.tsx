@@ -1,15 +1,16 @@
 import { Select, Skeleton, Text } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { FhirRequest } from "../utils/fhir";
+import { GetRequest } from "../utils/fhir/httpRequest";
+import { Patient } from "../utils/fhir/resources";
 
 const fetchPatients = async (): Promise<fhir4.Patient[]> => {
-	const request = FhirRequest.getPatients({
-		"_count": 100,
-	});
-	const response = await request.get();
-	console.log(response);
+	// const request = FhirRequest.getPatients({
+	// 	"_count": 100,
+	// });
+	const request = new FhirRequest<fhir4.Bundle>(GetRequest, [Patient]);
+	const response = await request.do();
 	const patients = response.entry.map(entry => entry.resource as fhir4.Patient);
-	console.log(patients);
 	return patients;
 }
 
@@ -47,6 +48,7 @@ const PatientDropdown: React.FC<PatientDropdownProps> = ({ onChange, currentPati
 		return <Text color="red">{error.message}</Text>
 	}
 
+	// TODO make MENU
 	return <Select onChange={(ev) => {
 		onChange(ev.target.value);
 	}} value={currentPatientId}>

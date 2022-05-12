@@ -10,6 +10,10 @@ import { FaMapPin, FaVenusMars, FaCalendar, FaPhone, FaUser } from "react-icons/
 import DataComponent from './components/DataComponent';
 import { FhirRequest } from './utils/fhir';
 import PatientDropdown from './components/PatientDropdown';
+import { GetRequest } from './utils/fhir/httpRequest';
+import { Id, Patient } from './utils/fhir/resources';
+import { Everything } from './utils/fhir/meta';
+import Timeline from './components/Timeline';
 
 const Main: React.FC = () => {
 	const [patientId, setPatientId] = useState("1");
@@ -41,11 +45,8 @@ const Main: React.FC = () => {
 			});
 			await timeoutProm;
 
-			// const data = await fetch('/patient-example.json');
-			// const json = await data.json();
-			const request = FhirRequest.getPatient(patientId);
-			request.validateFunc = patientValidator;
-			const data = await request.get();
+			const request = new FhirRequest<fhir4.Patient>(GetRequest, [Patient, Id("1")]);
+			const data = await request.do();
 			setData(data);
 		}
 
@@ -57,7 +58,6 @@ const Main: React.FC = () => {
 
 		const valid = patientValidator(data);
 		setIsValid(valid);
-		console.log(data);
 
 		if (valid && !isLoaded && data.id === patientId) {
 			toast({
@@ -80,6 +80,7 @@ const Main: React.FC = () => {
 
 	return (
 		<>
+			<PatientDropdown currentPatientId={patientId} onChange={setPatientId} />
 			<Box p={5} shadow="md" borderWidth="1px" m={10}>
 				<Skeleton className="App" isLoaded={isLoaded} >
 					<Flex justify="center" align="center" pos="relative" p={3}>
@@ -114,7 +115,7 @@ const Main: React.FC = () => {
 					</Box>
 				</Skeleton>
 			</Box>
-			<PatientDropdown currentPatientId={patientId} onChange={setPatientId} />
+			<Timeline patientId={patientId} />
 		</>
 	);
 }
