@@ -8,4 +8,7 @@
 
 ## Usage
 
-To run the example, run `yarn start`.
+To run the example:
+
+1. Set up HAPI server at `localhost:8080` (or change `"proxy"` in `package.json`).
+2. run `yarn start`
